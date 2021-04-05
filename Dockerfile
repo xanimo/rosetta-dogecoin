@@ -70,7 +70,7 @@ RUN cd src/ \
   && rm -rf src
 
 ## Build Final Image
-FROM frolvlad/alpine-glibc
+FROM xanimo/docker-alpine-glibc-1.13.4:latest
 
 RUN apk update && mkdir -p /app \
   && chown -R nobody:nogroup /app \
