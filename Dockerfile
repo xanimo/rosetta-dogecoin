@@ -72,7 +72,8 @@ RUN cd src/ \
 ## Build Final Image
 FROM xanimo/docker-alpine-glibc-1.13.4:latest
 
-RUN apk update && mkdir -p /app \
+RUN apk update && apk upgrade \
+  && mkdir -p /app \
   && chown -R nobody:nogroup /app \
   && mkdir -p /data \
   && chown -R nobody:nogroup /data
