@@ -72,7 +72,7 @@ RUN cd src/ \
 ## Build Final Image
 FROM frolvlad/alpine-glibc
 
-RUN mkdir -p /app \
+RUN apk update && mkdir -p /app \
   && chown -R nobody:nogroup /app \
   && mkdir -p /data \
   && chown -R nobody:nogroup /data

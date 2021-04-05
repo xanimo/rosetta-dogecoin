@@ -23,7 +23,7 @@ build:
 	docker build -t rosetta-dogecoin:latest https://github.com/rosetta-dogecoin/rosetta-dogecoin.git
 
 build-local:
-	docker build -t rosetta-dogecoin:latest .
+	docker build -t ${USER}/rosetta-dogecoin:${shell git branch --show-current} .
 
 build-release:
 	# make sure to always set version with vX.X.X
@@ -37,7 +37,7 @@ run-mainnet-offline:
 	docker run -d --rm -e "MODE=OFFLINE" -e "NETWORK=MAINNET" -e "PORT=8081" -p 8081:8081 rosetta-dogecoin:latest
 
 run-testnet-online:
-	docker run -d --rm --ulimit "nofile=${NOFILE}:${NOFILE}" -v "${PWD}/dogecoin-data:/data" -e "MODE=ONLINE" -e "NETWORK=TESTNET" -e "PORT=8080" -p 8080:8080 -p 44556:44556 rosetta-dogecoin:latest
+	docker run -d --rm --ulimit "nofile=${NOFILE}:${NOFILE}" -v "${PWD}/dogecoin-data:/data" -e "MODE=ONLINE" -e "NETWORK=TESTNET" -e "PORT=8080" -p 8080:8080 -p 44556:44556 ${USER}/rosetta-dogecoin:${shell git branch --show-current}
 
 run-testnet-offline:
 	docker run -d --rm -e "MODE=OFFLINE" -e "NETWORK=TESTNET" -e "PORT=8081" -p 8081:8081 rosetta-dogecoin:latest
