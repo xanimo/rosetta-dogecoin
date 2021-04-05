@@ -23,7 +23,7 @@ build:
 	docker build -t rosetta-dogecoin:latest https://github.com/rosetta-dogecoin/rosetta-dogecoin.git
 
 build-local:
-	docker build -t ${USER}/rosetta-dogecoin:${shell git branch --show-current} .
+	docker build -t ${USER}/${shell basename "$PWD"}:${shell git branch --show-current} .
 
 build-release:
 	# make sure to always set version with vX.X.X
