@@ -45,20 +45,6 @@ package services
 // 		Blockchain: bitcoin.Blockchain,
 // 	}
 
-<<<<<<< HEAD
-func TestConstructionService(t *testing.T) {
-	networkIdentifier = &types.NetworkIdentifier{
-		Network:    bitcoin.TestnetNetwork,
-		Blockchain: bitcoin.Blockchain,
-	}
-
-	cfg := &configuration.Configuration{
-		Mode:     configuration.Online,
-		Network:  networkIdentifier,
-		Params:   bitcoin.TestnetParams,
-		Currency: bitcoin.TestnetCurrency,
-	}
-=======
 // 	cfg := &configuration.Configuration{
 // 		Mode:     configuration.Online,
 // 		Network:  networkIdentifier,
@@ -70,7 +56,6 @@ func TestConstructionService(t *testing.T) {
 // 	mockClient := &mocks.Client{}
 // 	servicer := NewConstructionAPIService(cfg, mockClient, mockIndexer)
 // 	ctx := context.Background()
->>>>>>> 49e668e5bf9853f1d3f2cfb6a2591602b98fcd96
 
 // 	// Test Derive
 // 	publicKey := &types.PublicKey{
@@ -168,84 +153,6 @@ func TestConstructionService(t *testing.T) {
 // 		Options: forceMarshalMap(t, options),
 // 	}, preprocessResponse)
 
-<<<<<<< HEAD
-	// Test Preprocess
-	ops := []*types.Operation{
-		{
-			OperationIdentifier: &types.OperationIdentifier{
-				Index: 0,
-			},
-			Type: bitcoin.InputOpType,
-			Account: &types.AccountIdentifier{
-				Address: "tb1qcqzmqzkswhfshzd8kedhmtvgnxax48z4fklhvm",
-			},
-			Amount: &types.Amount{
-				Value:    "-1000000",
-				Currency: bitcoin.TestnetCurrency,
-			},
-			CoinChange: &types.CoinChange{
-				CoinIdentifier: &types.CoinIdentifier{
-					Identifier: "b14157a5c50503c8cd202a173613dd27e0027343c3d50cf85852dd020bf59c7f:1",
-				},
-				CoinAction: types.CoinSpent,
-			},
-		},
-		{
-			OperationIdentifier: &types.OperationIdentifier{
-				Index: 1,
-			},
-			Type: bitcoin.OutputOpType,
-			Account: &types.AccountIdentifier{
-				Address: "tb1q3r8xjf0c2yazxnq9ey3wayelygfjxpfqjvj5v7",
-			},
-			Amount: &types.Amount{
-				Value:    "954843",
-				Currency: bitcoin.TestnetCurrency,
-			},
-		},
-		{
-			OperationIdentifier: &types.OperationIdentifier{
-				Index: 2,
-			},
-			Type: bitcoin.OutputOpType,
-			Account: &types.AccountIdentifier{
-				Address: "tb1qjsrjvk2ug872pdypp33fjxke62y7awpgefr6ua",
-			},
-			Amount: &types.Amount{
-				Value:    "44657",
-				Currency: bitcoin.TestnetCurrency,
-			},
-		},
-	}
-	feeMultiplier := float64(0.75)
-	preprocessResponse, err := servicer.ConstructionPreprocess(
-		ctx,
-		&types.ConstructionPreprocessRequest{
-			NetworkIdentifier:      networkIdentifier,
-			Operations:             ops,
-			SuggestedFeeMultiplier: &feeMultiplier,
-		},
-	)
-	assert.Nil(t, err)
-	options := &preprocessOptions{
-		Coins: []*types.Coin{
-			{
-				CoinIdentifier: &types.CoinIdentifier{
-					Identifier: "b14157a5c50503c8cd202a173613dd27e0027343c3d50cf85852dd020bf59c7f:1",
-				},
-				Amount: &types.Amount{
-					Value:    "-1000000",
-					Currency: bitcoin.TestnetCurrency,
-				},
-			},
-		},
-		EstimatedSize: 142,
-		FeeMultiplier: &feeMultiplier,
-	}
-	assert.Equal(t, &types.ConstructionPreprocessResponse{
-		Options: forceMarshalMap(t, options),
-	}, preprocessResponse)
-=======
 // 	// Test Metadata
 // 	metadata := &constructionMetadata{
 // 		ScriptPubKeys: []*bitcoin.ScriptPubKey{
@@ -260,7 +167,6 @@ func TestConstructionService(t *testing.T) {
 // 			},
 // 		},
 // 	}
->>>>>>> 49e668e5bf9853f1d3f2cfb6a2591602b98fcd96
 
 // 	// Normal Fee
 // 	mockIndexer.On(
@@ -294,131 +200,6 @@ func TestConstructionService(t *testing.T) {
 // 		},
 // 	}, metadataResponse)
 
-<<<<<<< HEAD
-	// Normal Fee
-	mockIndexer.On(
-		"GetScriptPubKeys",
-		ctx,
-		options.Coins,
-	).Return(
-		metadata.ScriptPubKeys,
-		nil,
-	).Once()
-	mockClient.On(
-		"SuggestedFeeRate",
-		ctx,
-		defaultConfirmationTarget,
-	).Return(
-		bitcoin.MinFeeRate*10,
-		nil,
-	).Once()
-	metadataResponse, err := servicer.ConstructionMetadata(ctx, &types.ConstructionMetadataRequest{
-		NetworkIdentifier: networkIdentifier,
-		Options:           forceMarshalMap(t, options),
-	})
-	assert.Nil(t, err)
-	assert.Equal(t, &types.ConstructionMetadataResponse{
-		Metadata: forceMarshalMap(t, metadata),
-		SuggestedFee: []*types.Amount{
-			{
-				Value:    "1065", // 1,420 * 0.75
-				Currency: bitcoin.TestnetCurrency,
-			},
-		},
-	}, metadataResponse)
-
-	// Low Fee
-	mockIndexer.On(
-		"GetScriptPubKeys",
-		ctx,
-		options.Coins,
-	).Return(
-		metadata.ScriptPubKeys,
-		nil,
-	).Once()
-	mockClient.On(
-		"SuggestedFeeRate",
-		ctx,
-		defaultConfirmationTarget,
-	).Return(
-		bitcoin.MinFeeRate,
-		nil,
-	).Once()
-	metadataResponse, err = servicer.ConstructionMetadata(ctx, &types.ConstructionMetadataRequest{
-		NetworkIdentifier: networkIdentifier,
-		Options:           forceMarshalMap(t, options),
-	})
-	assert.Nil(t, err)
-	assert.Equal(t, &types.ConstructionMetadataResponse{
-		Metadata: forceMarshalMap(t, metadata),
-		SuggestedFee: []*types.Amount{
-			{
-				Value:    "142", // we don't go below minimum fee rate
-				Currency: bitcoin.TestnetCurrency,
-			},
-		},
-	}, metadataResponse)
-
-	// Test Payloads
-	unsignedRaw := "7b227472616e73616374696f6e223a2230313030303030303031376639636635306230326464353235386638306364356333343337333032653032376464313333363137326132306364633830333035633561353537343162313031303030303030303066666666666666663032646239313065303030303030303030303136303031343838636536393235663835313361323334633035633932326565393333663232313332333035323037316165303030303030303030303030313630303134393430373236353935633431666361306234383130633632393931616439643238396565623832383030303030303030222c227363726970745075624b657973223a5b7b2261736d223a22302063303035623030616430373564333062383961376236356237646164383839396261366139633535222c22686578223a223030313463303035623030616430373564333062383961376236356237646164383839396261366139633535222c2272657153696773223a312c2274797065223a227769746e6573735f76305f6b657968617368222c22616464726573736573223a5b227462317163717a6d717a6b7377686673687a64386b6564686d7476676e78617834387a34666b6c68766d225d7d5d2c22696e7075745f616d6f756e7473223a5b222d31303030303030225d2c22696e7075745f616464726573736573223a5b227462317163717a6d717a6b7377686673687a64386b6564686d7476676e78617834387a34666b6c68766d225d7d" // nolint
-	payloadsResponse, err := servicer.ConstructionPayloads(ctx, &types.ConstructionPayloadsRequest{
-		NetworkIdentifier: networkIdentifier,
-		Operations:        ops,
-		Metadata:          forceMarshalMap(t, metadata),
-	})
-	val0 := int64(0)
-	val1 := int64(1)
-	parseOps := []*types.Operation{
-		{
-			OperationIdentifier: &types.OperationIdentifier{
-				Index:        0,
-				NetworkIndex: &val0,
-			},
-			Type: bitcoin.InputOpType,
-			Account: &types.AccountIdentifier{
-				Address: "tb1qcqzmqzkswhfshzd8kedhmtvgnxax48z4fklhvm",
-			},
-			Amount: &types.Amount{
-				Value:    "-1000000",
-				Currency: bitcoin.TestnetCurrency,
-			},
-			CoinChange: &types.CoinChange{
-				CoinIdentifier: &types.CoinIdentifier{
-					Identifier: "b14157a5c50503c8cd202a173613dd27e0027343c3d50cf85852dd020bf59c7f:1",
-				},
-				CoinAction: types.CoinSpent,
-			},
-		},
-		{
-			OperationIdentifier: &types.OperationIdentifier{
-				Index:        1,
-				NetworkIndex: &val0,
-			},
-			Type: bitcoin.OutputOpType,
-			Account: &types.AccountIdentifier{
-				Address: "tb1q3r8xjf0c2yazxnq9ey3wayelygfjxpfqjvj5v7",
-			},
-			Amount: &types.Amount{
-				Value:    "954843",
-				Currency: bitcoin.TestnetCurrency,
-			},
-		},
-		{
-			OperationIdentifier: &types.OperationIdentifier{
-				Index:        2,
-				NetworkIndex: &val1,
-			},
-			Type: bitcoin.OutputOpType,
-			Account: &types.AccountIdentifier{
-				Address: "tb1qjsrjvk2ug872pdypp33fjxke62y7awpgefr6ua",
-			},
-			Amount: &types.Amount{
-				Value:    "44657",
-				Currency: bitcoin.TestnetCurrency,
-			},
-		},
-	}
-=======
 // 	// Low Fee
 // 	mockIndexer.On(
 // 		"GetScriptPubKeys",
@@ -526,7 +307,6 @@ func TestConstructionService(t *testing.T) {
 // 		UnsignedTransaction: unsignedRaw,
 // 		Payloads:            []*types.SigningPayload{signingPayload},
 // 	}, payloadsResponse)
->>>>>>> 49e668e5bf9853f1d3f2cfb6a2591602b98fcd96
 
 // 	// Test Parse Unsigned
 // 	parseUnsignedResponse, err := servicer.ConstructionParse(ctx, &types.ConstructionParseRequest{
