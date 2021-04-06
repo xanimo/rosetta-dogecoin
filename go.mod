@@ -9,6 +9,7 @@ require (
 	github.com/coinbase/rosetta-sdk-go v0.6.5
 	github.com/dgraph-io/badger/v2 v2.2007.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
+	github.com/karalabe/xgo v0.0.0-20191115072854-c5ccff8648a7 // indirect
 	github.com/stretchr/testify v1.6.1
 	go.uber.org/zap v1.16.0
 	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208
