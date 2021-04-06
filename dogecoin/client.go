@@ -402,6 +402,16 @@ func (b *Client) getBlock(
 		return nil, fmt.Errorf("%w: error fetching block by hash %s", err, hash)
 	}
 
+	// var txs []*Transaction
+
+	// for _, txid := range response.Result.TxIds {
+	// 	transaction, err := b.GetRawTransaction(ctx, txid)
+	// 	if err != nil {
+	// 		return nil, fmt.Errorf("%w: error fetching block by hash %s", err, hash)
+	// 	}
+	// 	txs = append(txs, transaction)
+	// }
+
 	params = []interface{}{hash, false}
 
 	rawResponse := &RawBlockResponse{}
@@ -419,7 +429,7 @@ func (b *Client) getBlock(
 		return nil, err
 	}
 
-	var txs []*Transaction
+	var txsRaw []*Transaction
 
 	for _, tx := range msgBlock.Transactions {
 		buf := bytes.NewBuffer(make([]byte, 0, tx.SerializeSize()))
@@ -432,7 +442,7 @@ func (b *Client) getBlock(
 		if err := b.post(ctx, "decoderawtransaction", params, txV); err != nil {
 			return nil, fmt.Errorf("%w: error decoding block with hexstring %s", err, hexstring)
 		}
-		txs = append(txs, txV.Result)
+		txsRaw = append(txsRaw, txV.Result)
 	}
 
 	return &Block{
@@ -448,7 +458,8 @@ func (b *Client) getBlock(
 		Weight:            response.Result.Weight,
 		Bits:              response.Result.Bits,
 		Difficulty:        response.Result.Difficulty,
-		Txs:               txs,
+		Txs:               txsRaw,
+		TxIds:             response.Result.TxIds,
 	}, nil
 }
 

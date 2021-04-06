@@ -189,6 +189,7 @@ type Block struct {
 	Weight            int64          `json:"weight"`
 	Bits              string         `json:"bits"`
 	Difficulty        float64        `json:"difficulty"`
+	TxIds             []string       `json:"txs"`
 	Txs               []*Transaction `json:"-"`
 }
 
