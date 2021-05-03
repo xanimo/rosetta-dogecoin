@@ -36,6 +36,7 @@ import (
 	"github.com/coinbase/rosetta-sdk-go/server"
 	"github.com/coinbase/rosetta-sdk-go/types"
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
+	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 )
@@ -57,6 +58,8 @@ const (
 
 var (
 	signalReceived = false
+
+	dataDirectory string = "/data"
 )
 
 // handleSignals handles OS signals so we can ensure we close database
@@ -114,6 +117,10 @@ func startOnlineDependencies(
 }
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Print("Error loading .env file", err)
+	}
+
 	loggerRaw, err := zap.NewDevelopment()
 	if err != nil {
 		log.Fatalf("can't initialize zap logger: %v", err)
@@ -130,7 +137,11 @@ func main() {
 
 	logger := loggerRaw.Sugar().Named("main")
 
-	cfg, err := dogecoin.LoadConfiguration(configuration.DataDirectory)
+	if len(configuration.DataDirectory) != 0 {
+		dataDirectory = configuration.DataDirectory
+	}
+
+	cfg, err := dogecoin.LoadConfiguration(dataDirectory)
 	if err != nil {
 		logger.Fatalw("unable to load configuration", "error", err)
 	}

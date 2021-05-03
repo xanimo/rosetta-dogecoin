@@ -21,6 +21,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/rosetta-dogecoin/rosetta-dogecoin/configuration"
@@ -30,18 +31,8 @@ import (
 )
 
 const (
-	// mainnetConfigPath is the path of the Bitcoin
-	// configuration file for mainnet.
-	mainnetConfigPath = "/app/bitcoin-mainnet.conf"
-
-	// testnetConfigPath is the path of the Bitcoin
-	// configuration file for testnet.
-	testnetConfigPath = "/app/bitcoin-testnet.conf"
-
 	// Zstandard compression dictionaries
-	transactionNamespace         = "transaction"
-	testnetTransactionDictionary = "/app/testnet-transaction.zstd"
-	mainnetTransactionDictionary = "/app/mainnet-transaction.zstd"
+	transactionNamespace = "transaction"
 
 	mainnetRPCPort = 22555
 	testnetRPCPort = 44555
@@ -57,10 +48,6 @@ const (
 	// attempt to prune once an hour
 	pruneFrequency = 60 * time.Minute
 
-	// DataDirectory is the default location for all
-	// persistent data.
-	DataDirectory = "/data"
-
 	bitcoindPath = "dogecoind"
 	indexerPath  = "indexer"
 
@@ -69,9 +56,37 @@ const (
 	allFilePermissions = 0777
 )
 
+var (
+	// configurationDirectory is the configuration path prefix
+	configurationDirectory string = os.Getenv("CONFIG_DIR")
+
+	// mainnetConfigPath is the path of the Bitcoin
+	// configuration file for mainnet.
+	mainnetConfigPath string
+
+	// testnetConfigPath is the path of the Bitcoin
+	// configuration file for testnet.
+	testnetConfigPath string
+
+	testnetTransactionDictionary string
+	mainnetTransactionDictionary string
+
+	// DataDirectory is the default location for all
+	// persistent data.
+	DataDirectory string = os.Getenv("DATA_DIR")
+)
+
 // LoadConfiguration attempts to create a new Configuration
 // using the ENVs in the environment.
 func LoadConfiguration(baseDirectory string) (*configuration.Configuration, error) {
+	if len(configurationDirectory) == 0 && !strings.HasSuffix(os.Args[0], ".test") {
+		configurationDirectory = "/app"
+		mainnetConfigPath = configurationDirectory + "/bitcoin-mainnet.conf"
+		testnetConfigPath = configurationDirectory + "/bitcoin-testnet.conf"
+		testnetTransactionDictionary = configurationDirectory + "/testnet-transaction.zstd"
+		mainnetTransactionDictionary = configurationDirectory + "/mainnet-transaction.zstd"
+	}
+
 	config := &configuration.Configuration{}
 	config.Pruning = &configuration.PruningConfiguration{
 		Frequency: pruneFrequency,
