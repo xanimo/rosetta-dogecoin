@@ -21,7 +21,6 @@ import (
 	"os"
 	"path"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/rosetta-dogecoin/rosetta-dogecoin/configuration"
@@ -54,37 +53,28 @@ const (
 	// allFilePermissions specifies anyone can do anything
 	// to the file.
 	allFilePermissions = 0777
+
+	// defaults
+	defaultConfigurationDirectory = "/app"
+
+	mainnetConfigFile = "bitcoin-mainnet.conf"
+	testnetConfigFile = "bitcoin-testnet.conf"
+	mainnetTxDict = "mainnet-transaction.zstd"
+	testnetTxDict = "testnet-transaction.zstd"
 )
 
 var (
 	// configurationDirectory is the configuration path prefix
-	configurationDirectory string = os.Getenv("CONFIG_DIR")
-
-	// mainnetConfigPath is the path of the Bitcoin
-	// configuration file for mainnet.
-	mainnetConfigPath string
-
-	// testnetConfigPath is the path of the Bitcoin
-	// configuration file for testnet.
-	testnetConfigPath string
-
-	testnetTransactionDictionary string
-	mainnetTransactionDictionary string
-
-	// DataDirectory is the default location for all
-	// persistent data.
-	DataDirectory string = os.Getenv("DATA_DIR")
+	configurationDirectory string
 )
 
 // LoadConfiguration attempts to create a new Configuration
 // using the ENVs in the environment.
 func LoadConfiguration(baseDirectory string) (*configuration.Configuration, error) {
-	if len(configurationDirectory) == 0 && !strings.HasSuffix(os.Args[0], ".test") {
-		configurationDirectory = "/app"
-		mainnetConfigPath = configurationDirectory + "/bitcoin-mainnet.conf"
-		testnetConfigPath = configurationDirectory + "/bitcoin-testnet.conf"
-		testnetTransactionDictionary = configurationDirectory + "/testnet-transaction.zstd"
-		mainnetTransactionDictionary = configurationDirectory + "/mainnet-transaction.zstd"
+	configurationDirectory = os.Getenv("CONFIG_DIR")
+
+	if len(configurationDirectory) == 0 {
+		configurationDirectory = defaultConfigurationDirectory
 	}
 
 	config := &configuration.Configuration{}
@@ -125,12 +115,12 @@ func LoadConfiguration(baseDirectory string) (*configuration.Configuration, erro
 		config.GenesisBlockIdentifier = MainnetGenesisBlockIdentifier
 		config.Params = MainnetParams
 		config.Currency = MainnetCurrency
-		config.ConfigPath = mainnetConfigPath
+		config.ConfigPath = configurationDirectory + "/" + mainnetConfigFile
 		config.RPCPort = mainnetRPCPort
 		config.Compressors = []*encoder.CompressorEntry{
 			{
 				Namespace:      transactionNamespace,
-				DictionaryPath: mainnetTransactionDictionary,
+				DictionaryPath: configurationDirectory + "/" + mainnetTxDict,
 			},
 		}
 	case configuration.Testnet:
@@ -141,12 +131,12 @@ func LoadConfiguration(baseDirectory string) (*configuration.Configuration, erro
 		config.GenesisBlockIdentifier = TestnetGenesisBlockIdentifier
 		config.Params = TestnetParams
 		config.Currency = TestnetCurrency
-		config.ConfigPath = testnetConfigPath
+		config.ConfigPath = configurationDirectory + "/" + testnetConfigFile
 		config.RPCPort = testnetRPCPort
 		config.Compressors = []*encoder.CompressorEntry{
 			{
 				Namespace:      transactionNamespace,
-				DictionaryPath: testnetTransactionDictionary,
+				DictionaryPath: configurationDirectory + "/" + testnetTxDict,
 			},
 		}
 	case "":

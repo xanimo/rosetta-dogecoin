@@ -54,12 +54,15 @@ const (
 	// idleTimeout is the maximum amount of time to wait for the
 	// next request when keep-alives are enabled.
 	idleTimeout = 30 * time.Second
+
+	// default data directory
+	defaultDataDirectory = "/data"
 )
 
 var (
 	signalReceived = false
 
-	dataDirectory string = "/data"
+	dataDirectory string
 )
 
 // handleSignals handles OS signals so we can ensure we close database
@@ -137,8 +140,9 @@ func main() {
 
 	logger := loggerRaw.Sugar().Named("main")
 
-	if len(configuration.DataDirectory) != 0 {
-		dataDirectory = configuration.DataDirectory
+	dataDirectory = os.Getenv("DATA_DIR")
+	if len(dataDirectory) == 0 {
+		dataDirectory = defaultDataDirectory
 	}
 
 	cfg, err := dogecoin.LoadConfiguration(dataDirectory)
